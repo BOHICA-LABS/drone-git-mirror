@@ -5,13 +5,15 @@
 
 function prepare_vars() {
     build_failed=1
-    git_email='drone@osshelp.ru'
+    git_email='drone@bohicalabs.com'
     git_name='Drone CI'
     mirror_mode=full
     ignore_errors=false
     tmp_dir=/tmp/remote
     current_repo_dir=/drone/src
     mirror_ignore_list="${current_repo_dir}/.mirror_ignore"
+    ssh_key="false"
+    user_token="false"
 
     test -n "${PLUGIN_TARGET_REPO}"        && target_repo="${PLUGIN_TARGET_REPO}"
     test -n "${PLUGIN_GIT_NAME}"           && git_name="${PLUGIN_GIT_NAME}"
@@ -25,9 +27,17 @@ function prepare_vars() {
     test -f "${mirror_ignore_list}" -a -s "${mirror_ignore_list}" && \
       mirror_mode=partial
     test -z "${PLUGIN_SSH_KEY}" -a -z "${PLUGIN_SSH_KEY_FILE}" && \
-      show_error "No private key specified"
+      show_warning "No private key specified" || ssh_key=true
     test -n "${PLUGIN_SSH_KEY_FILE}" -a ! -r "${PLUGIN_SSH_KEY_FILE}" && \
       show_error "Can't read private key from ${PLUGIN_SSH_KEY_FILE}"
+    test -z "${PLUGIN_GIT_USERNAME}" -a -z "${PLUGIN_GIT_PASSWORD}" && \
+      show_warning "No git username and password/token specified" || {
+        user_token="true"
+        test -z "${PLUGIN_GIT_DOMAIN}" && \
+          show_error "The git Domain is not set"
+      }
+    test "${ssh_key}" == "false" -a "${user_token}" == "false" && \
+      show_error "No authentication mechanism specified"
 }
 
 function show_notice()  { echo -e "\e[34m[NOTICE. $(date '+%Y/%m/%d-%H:%M:%S')]\e[39m ${1}"; }
@@ -43,22 +53,40 @@ function show_error()   {
 
 function prepare_repo_access() {
   test "${mirror_mode}" == "full" && {
-    show_notice "Preparing ~/.netrc file"
-    echo "machine $DRONE_NETRC_MACHINE" > ~/.netrc
-    echo "login $DRONE_NETRC_USERNAME" >> ~/.netrc
-    echo "password $DRONE_NETRC_PASSWORD" >> ~/.netrc
+    show_notice "Preparing ~/.netrc file for full mirror"
+    {
+      echo "machine $DRONE_NETRC_MACHINE"
+      echo "login $DRONE_NETRC_USERNAME"
+      echo "password $DRONE_NETRC_PASSWORD"
+      echo ""
+    } >> ~/.netrc
+  }
+  test "${user_token}" == "true" && {
+    show_notice "Adding Credentials to ~/.netrc file"
+    {
+      echo "machine $PLUGIN_GIT_DOMAIN"
+      echo "machine $PLUGIN_GIT_USERNAME"
+      echo "password $PLUGIN_GIT_PASSWORD}"
+      echo ""
+    }
+  }
+
+  test -e ~/.netrc && {
+    show_notice "Setting correct permissions on ~/.netrc file"
     chmod 600 ~/.netrc
   }
 
-  show_notice "Preparing private key and known_hosts"
-  local key_file=~/.ssh/id_rsa
-  mkdir -p ~/.ssh
-  chmod -R go-rwx ~/.ssh
-  test -n "${PLUGIN_SSH_KEY}" && echo "${PLUGIN_SSH_KEY}" > "${key_file}"
-  test -z "${PLUGIN_SSH_KEY}" && cat "${PLUGIN_SSH_KEY_FILE}" > "${key_file}"
-  chown root:root "${key_file}" && \
-    chmod 0600 "${key_file}"
-  ssh-keyscan -t rsa,dsa,ecdsa "$(sed -r 's/.+@//;s/:.+//' <<< "${target_repo}")" >> ~/.ssh/known_hosts
+  test "${ssh_key}" == "true" && {
+    show_notice "Preparing private key and known_hosts"
+    local key_file=~/.ssh/id_rsa
+    mkdir -p ~/.ssh
+    chmod -R go-rwx ~/.ssh
+    test -n "${PLUGIN_SSH_KEY}" && echo "${PLUGIN_SSH_KEY}" > "${key_file}"
+    test -z "${PLUGIN_SSH_KEY}" && cat "${PLUGIN_SSH_KEY_FILE}" > "${key_file}"
+    chown root:root "${key_file}" && \
+      chmod 0600 "${key_file}"
+    ssh-keyscan -t rsa,dsa,ecdsa "$(sed -r 's/.+@//;s/:.+//' <<< "${target_repo}")" >> ~/.ssh/known_hosts
+  }
 }
 
 function clone_target_repo() {
@@ -70,7 +98,7 @@ function clone_target_repo() {
 }
 
 function sync_changes_from_current_repo() {
-  show_notice "Syncing chages from ${current_repo_dir} to ${tmp_dir}"
+  show_notice "Syncing changes from ${current_repo_dir} to ${tmp_dir}"
   local err=1
   rsync -icrv --delete --exclude '.git' --exclude-from="${mirror_ignore_list}" "${current_repo_dir}/" "${tmp_dir}/" && \
     err=0
