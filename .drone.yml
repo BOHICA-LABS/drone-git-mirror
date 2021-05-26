@@ -48,7 +48,7 @@ steps:
       password:
         from_secret: docker_password
       repo: "bohicalabs/drone-git-mirror"
-      tag: "${DRONE_TAG}"
+      auto_tag: true
     when:
       ref:
         - refs/head/master
