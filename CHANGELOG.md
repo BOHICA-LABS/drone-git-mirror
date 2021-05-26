@@ -2,6 +2,15 @@
 ## [Unreleased]
 
 
+<a name="v1.0.2"></a>
+## [v1.0.2] - 2021-05-25
+### Bug Fixes
+- **dockerfile:** correct openssh-client version
+
+### Documentation Improvements
+- **changelog:** auto changelog update v1.0.1 [CI SKIP]
+
+
 <a name="v1.0.1"></a>
 ## [v1.0.1] - 2021-05-25
 ### Documentation Improvements
@@ -30,5 +39,6 @@
 - **ignore:** add default gitignore
 
 
-[Unreleased]: https://github.com/BOHICA-LABS/drone-git-mirror/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/BOHICA-LABS/drone-git-mirror/compare/v1.0.2...HEAD
+[v1.0.2]: https://github.com/BOHICA-LABS/drone-git-mirror/compare/v1.0.1...v1.0.2
 [v1.0.1]: https://github.com/BOHICA-LABS/drone-git-mirror/compare/v1.0.0...v1.0.1
