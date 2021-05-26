@@ -2,6 +2,15 @@
 ## [Unreleased]
 
 
+<a name="v1.0.1"></a>
+## [v1.0.1] - 2021-05-25
+### Documentation Improvements
+- **changelog:** auto changelog update v1.0.0 [CI SKIP]
+
+### Maintenance
+- **drone:** change pipline name
+
+
 <a name="v1.0.0"></a>
 ## v1.0.0 - 2021-05-25
 ### Documentation Improvements
@@ -21,4 +30,5 @@
 - **ignore:** add default gitignore
 
 
-[Unreleased]: https://github.com/BOHICA-LABS/drone-git-mirror/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/BOHICA-LABS/drone-git-mirror/compare/v1.0.1...HEAD
+[v1.0.1]: https://github.com/BOHICA-LABS/drone-git-mirror/compare/v1.0.0...v1.0.1
