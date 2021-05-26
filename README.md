@@ -55,6 +55,9 @@ The content of `mirror_ignore_list` file should be compatible with `--exclude-fr
 | -------- | -------- | -------- |
 | `target_repo` | - | SSH clone URL of target repo |
 | `ssh_key` | - | Private key with R/W permissions to use for interacting with `target_repo`. |
+| `git_domain` | - | The domain of the target git repo such as github.com. |
+| `git_username` | - | If using username and password/token, the authorized user of the target repo. |
+| `git_password` | - | If using username and password/token, the password/token of the target repo. |
 | `git_email` | `drone@bohicalabs` | E-mail that will be used while pushing changes |
 | `git_name` | `Drone CI` | Name that will be used while pushing changes |
 | `ignore_errors` | `false` | If set to `true` the plugin will try to ignore all occurring errors to prevent build failing because of itself. |
