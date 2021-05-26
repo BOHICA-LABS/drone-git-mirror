@@ -70,7 +70,7 @@ function prepare_repo_access() {
       echo ""
     } >> ~/.netrc
     show_notice "Config target url"
-    target_repo="https://${PLUGIN_GIT_USERNAME}:${PLUGIN_GIT_PASSWORD}@${PLUGIN_TARGET_REPO}"
+    target_repo="https://${PLUGIN_GIT_PASSWORD}@${PLUGIN_TARGET_REPO}"
   }
 
   test -e ~/.netrc && {
