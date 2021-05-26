@@ -68,7 +68,7 @@ function prepare_repo_access() {
       echo "machine $PLUGIN_GIT_USERNAME"
       echo "password $PLUGIN_GIT_PASSWORD}"
       echo ""
-    }
+    } >> ~/.netrc
   }
 
   test -e ~/.netrc && {
