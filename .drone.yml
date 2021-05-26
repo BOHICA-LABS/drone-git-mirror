@@ -1,6 +1,6 @@
 ---
 kind: pipeline
-name: amd64
+name: release
 type: docker
 
 platform:
